@@ -93,7 +93,7 @@ class MyTokenizer(BaseEstimator, MetaEstimatorMixin):
         return [parser(sentence) for sentence in X]
 
 
-w2v_vectorizer = D2VTransformer(dm=1, size=100, min_count=2, iter=10, seed=0)
+w2v_vectorizer = D2VTransformer(dm=1, size=128, min_count=3, iter=10, seed=0)
 
 
 count_characters = (
@@ -152,6 +152,7 @@ log = Pipeline(
                 [
                     ("nb_unique_tokens", get_nb_unique_tokens),
                     ("avg_token_len", get_avg_token_len),
+                    count_characters,
                     (
                         "d2v",
                         Pipeline(

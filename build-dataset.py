@@ -17,7 +17,6 @@ def load_nontrump_data(filepath, txt_col):
 trump = pd.read_csv("data/trump.csv")
 trump["trump"] = 1
 trump = trump[relevant_columns]
-trump.head(5)
 
 # Other tweets. This a collection of various generic tweets dataset.
 filepaths = [
@@ -62,14 +61,14 @@ dataset = trump
 for df in other_df:
     dataset = dataset.append(df)
 
-# We are only interested in writing style, so we remove links.
-
 
 def remove_links(txt):
+    # Remove the links
     return re.sub(r"\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*", "", txt)
 
 
 def remove_trump(txt):
+    # Remove hashtags, @ ats, and a signature in many Trump's tweets
     return re.sub(r"(@|#\w*\b|--|(d|D)onald|J\.|(t|T)rump)", " ", txt)
 
 

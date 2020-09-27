@@ -1,3 +1,4 @@
 /ignore/*
 *.joblib
 tfidf_len_vocab_log_*
+models/*

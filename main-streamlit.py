@@ -53,7 +53,7 @@ class MyFunctionTransformer(BaseEstimator, TransformerMixin):
 
 @st.cache(hash_funcs={Pipeline: id})
 def load_model():
-    model = load("tfidf_len_vocab_log_2")
+    model = load("tfidf_len_vocab_log_3")
     # Set nb of jobs to 1 for streamlit-compatibility
     model.steps[0][1].n_jobs = 1
     model.steps[1][1].n_jobs = 1
@@ -78,7 +78,7 @@ def get_description(score):
         ["This sounds a lot like Trump.", "This sounds VERY MUCH like Trump."],
         [
             "Trump would totally tweet that.",
-            "In a parallel universe Trump actually did tweet that.",
+            "In a parallel universe Trump did tweet that.",
         ],
         [
             "Totally sounds like Trump (could be him).",
@@ -101,15 +101,11 @@ Enter some text below. A machine learning algorithm tells you if it sounds\
 """
 )
 
-user_input = (
-    st.text_area(
-        label="Does this text sounds like a Donald Trump's tweet?",
-        max_chars=280,
-        height=128,
-    )
-    .strip()
-    .replace("\n", "")
-)
+user_input = st.text_area(
+    label="Does this text sounds like a Donald Trump's tweet?",
+    max_chars=280,
+    height=128,
+).strip()
 
 if user_input != "":
     score = model.predict_proba([user_input])[:, 1]
@@ -125,12 +121,12 @@ st.markdown(
     --------------
     # About 
 
-    Made by [Nicolas Oulianov](https://github.com/oulianov/) as a silly joke. \
-        I do not support Donald Trump. 
-
     **How does the algorithm work?** A machine learning algorithm was trained \
-        over 280,000 tweets to automatically understand the syntax and semantics\
-             of Donald Trump's tweets. Visit the github repository for more details.
+    over 280,000 tweets to automatically understand the syntax and semantics\
+    of Donald Trump's tweets. Visit the \
+    [github repository](https://github.com/oulianov/soundslikeatrumptweet) for more details.
     
+    Made by [Nicolas Oulianov](https://github.com/oulianov/) as a silly joke. \
+    I do not support Donald Trump. 
     """
 )
