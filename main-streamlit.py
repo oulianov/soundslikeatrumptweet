@@ -1,13 +1,10 @@
 import streamlit as st
-from joblib import load
-from sklearn.pipeline import Pipeline
 from random import sample
+from load_bert_model import load_bert_model
+from torch.nn import Module
 
-import marshal
-from types import FunctionType
-from sklearn.base import BaseEstimator, TransformerMixin
-
-PRODUCTION_MODE = True
+MODEL_NAME = "models/bert_cased_6.pt"
+PRODUCTION_MODE = False
 
 st.beta_set_page_config(page_title="Sounds like a Trump tweet", page_icon="trump.jpeg")
 
@@ -22,42 +19,10 @@ footer {visibility: hidden;}
 if PRODUCTION_MODE:
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# Used to circonvent limitations when saving custom transformers
-class MyFunctionTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, f):
-        self.func = f
 
-    def __call__(self, X):
-        return self.func(X)
-
-    def __getstate__(self):
-        self.func_name = self.func.__name__
-        self.func_code = marshal.dumps(self.func.__code__)
-        del self.func
-        return self.__dict__
-
-    def __setstate__(self, d):
-        d["func"] = FunctionType(
-            marshal.loads(d["func_code"]), globals(), d["func_name"]
-        )
-        del d["func_name"]
-        del d["func_code"]
-        self.__dict__ = d
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return self.func(X)
-
-
-@st.cache(hash_funcs={Pipeline: id})
+@st.cache(hash_funcs={Module: id})
 def load_model():
-    model = load("tfidf_len_vocab_log_3")
-    # Set nb of jobs to 1 for streamlit-compatibility
-    model.steps[0][1].n_jobs = 1
-    model.steps[1][1].n_jobs = 1
-    return model
+    return load_bert_model(MODEL_NAME)
 
 
 model = load_model()
@@ -96,8 +61,8 @@ st.markdown(
     """
 # Sounds like a Trump tweet
 
-Enter some text below. A machine learning algorithm tells you if it sounds\
-     like a Donald Trump's tweet. Try to fool the algorithm!
+Enter some text below. A Deep Learning model tells you if it sounds\
+     like a Donald Trump's tweet. Try to fool the model!
 """
 )
 
@@ -121,8 +86,8 @@ st.markdown(
     --------------
     # About 
 
-    **How does the algorithm work?** A machine learning algorithm was trained \
-    over 280,000 tweets to automatically understand the syntax and semantics\
+    **How does the algorithm work?** A Deep Learning model was trained \
+    over 120,000 tweets to automatically understand the syntax and semantics\
     of Donald Trump's tweets. Visit the \
     [github repository](https://github.com/oulianov/soundslikeatrumptweet) for more details.
     
