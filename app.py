@@ -3,8 +3,8 @@ from random import sample
 from load_bert_model import load_bert_model
 from torch.nn import Module
 
-MODEL_NAME = "models/minibert_cased_3.pt"
-PRODUCTION_MODE = False
+MODEL_NAME = "minibert_cased_3.pt"
+PRODUCTION_MODE = True
 
 st.beta_set_page_config(page_title="Sounds like a Trump tweet", page_icon="trump.jpeg")
 
@@ -35,23 +35,45 @@ def get_description(score):
             "Not written like a Trump tweet. For sure.",
             "This is definitely not a Trump tweet.",
         ],
-        ["Doesn't sound much like a Trump tweet.", "Not Trump-esque at all."],
-        ["Not very Trump-like.", "Hmm, not very Trump-ish."],
-        ["Doesn't really sound like Trump."],
-        ["Trump vibes for sure.", "Feels somehow like Trump."],
+        [
+            "Doesn't sound like a Trump tweet.",
+            "Not Trump-esque at all.",
+            "This has no Trump's tweeter vibes.",
+        ],
+        [
+            "Not very Trump-like.",
+            "Not very Trump-ish.",
+            "Would be weird if Trump tweeted that, wouldn't it?",
+        ],
+        [
+            "Doesn't really sound like Trump.",
+            "Trump wouldn't write that on tweeter.",
+            "Trump wouldn't tweet it like that.",
+        ],
+        [
+            "Maybe some Trump vibes.",
+            "Feels somehow like Trump.",
+            "Kinda Trump and kinda not trump.",
+        ],
         [
             "This is written a bit like Trump.",
             "Trump could maybe write this.",
         ],
-        ["Trump pretty much writes like this.", "This sounds a lot like Trump."],
+        [
+            "Trump really could have written this (while tired).",
+            "This sounds a lot like Trump.",
+            "Lots of Trump energy.",
+        ],
         [
             "Classic Trump style.",
             "That's Trump's style for sure!",
+            "Definitely Trump's tweeter mood!",
         ],
         [
-            "This is how Trump write!",
-            "Trump could easily write that.",
-            "That's pretty much how Trump writes.",
+            "Yep, this is written like a Trump tweet.",
+            "Trump could have literally tweeted that.",
+            "That's pretty much how Trump writes on twitter.",
+            "Totally written like a Trump tweet.",
         ],
     ]
     score_range = [i / len(desc_list) for i in range(len(desc_list) + 1)]
@@ -88,7 +110,6 @@ st.markdown(
     """
     --------------
     ### Tips to make your tweet Trump-like
-    - WRITE IN ALL CAPS
     - Add exclamation points!!!
     - Write. Short. Sentences. 
     - Use Trump's linguo.

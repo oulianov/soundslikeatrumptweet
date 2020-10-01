@@ -1,6 +1,7 @@
 from transformers import BertModel, BertConfig, AutoTokenizer
-from torch import load, device, nn
+from torch import save, load, device, nn
 import numpy as np
+import pickle
 
 
 class BERT_Arch(nn.Module):
