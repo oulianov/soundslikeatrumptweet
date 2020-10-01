@@ -1,4 +1,4 @@
-from transformers import DistilBertModel, DistilBertConfig, AutoTokenizer
+from transformers import BertModel, BertConfig, AutoTokenizer
 from torch import load, device, nn
 import numpy as np
 
@@ -13,7 +13,7 @@ class BERT_Arch(nn.Module):
         # relu activation function
         self.relu = nn.ReLU()
         # dense layer 1
-        self.fc1 = nn.Linear(768, 32)
+        self.fc1 = nn.Linear(256, 32)
         # Batch normalization
         self.batchnorm_32 = nn.BatchNorm1d(32)
         # dense layer 2
@@ -24,8 +24,8 @@ class BERT_Arch(nn.Module):
         # softmax activation function
         self.softmax = nn.LogSoftmax(dim=1)
 
-    def forward(self, input_ids, attention_mask):
-        cls_hs = self.bert(input_ids, attention_mask=attention_mask)[0][:, 0, :]
+    def forward(self, input_ids, attention_mask, **args):
+        cls_hs = self.bert(input_ids, attention_mask=attention_mask, **args)[0][:, 0, :]
         x = self.dropout(cls_hs)
         # First hidden layer
         x = self.fc1(x)
@@ -58,30 +58,28 @@ class BERT_Arch(nn.Module):
 def load_bert_model(MODEL_NAME, cased=True):
 
     if cased:
-        config = DistilBertConfig(
+        config = BertConfig(
             **{
-                "activation": "gelu",
-                "attention_dropout": 0.1,
-                "dim": 768,
-                "dropout": 0.1,
-                "hidden_dim": 3072,
+                "attention_probs_dropout_prob": 0.1,
+                "gradient_checkpointing": False,
+                "hidden_act": "gelu",
+                "hidden_dropout_prob": 0.1,
+                "hidden_size": 256,
                 "initializer_range": 0.02,
+                "intermediate_size": 1024,
+                "layer_norm_eps": 1e-12,
                 "max_position_embeddings": 512,
-                "model_type": "distilbert",
-                "n_heads": 12,
-                "n_layers": 6,
-                "output_past": True,
+                "model_type": "bert",
+                "num_attention_heads": 4,
+                "num_hidden_layers": 4,
                 "pad_token_id": 0,
-                "qa_dropout": 0.1,
-                "seq_classif_dropout": 0.2,
-                "sinusoidal_pos_embds": False,
-                "tie_weights_": True,
-                "vocab_size": 28996,
+                "type_vocab_size": 2,
+                "vocab_size": 30522,
             }
         )
-        bert = DistilBertModel(config)
+        bert = BertModel(config)
         tokenizer = AutoTokenizer.from_pretrained(
-            "distilbert-base-cased",
+            "prajjwal1/bert-mini",
             model_max_length=280,
             tokenize_chinese_chars=False,
         )

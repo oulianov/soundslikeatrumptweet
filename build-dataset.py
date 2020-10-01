@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import re
+from datetime import datetime
 
 relevant_columns = ["content", "trump"]
 
@@ -15,6 +16,9 @@ def load_nontrump_data(filepath, txt_col):
 
 # Tweets by trump
 trump = pd.read_csv("data/trump.csv")
+trump["date"] = pd.to_datetime(trump["date"])
+# Donald Trump campaign started on 16 june 2016
+trump = trump[trump["date"] > datetime(2015, 6, 1)]
 trump["trump"] = 1
 trump = trump[relevant_columns]
 
@@ -69,11 +73,24 @@ def remove_links(txt):
 
 def remove_trump(txt):
     # Remove hashtags, @ ats, and a signature in many Trump's tweets
-    return re.sub(r"(@|#\w*\b|--|(d|D)onald|J\.|(t|T)rump)", " ", txt)
+    return re.sub(r"((@|#) \w*\b|(@|#)\w*\b|--|(d|D)onald|J\.|(t|T)rump)", "", txt)
+
+
+dataset["content"] = dataset["content"].map(remove_links)
+dataset["content"] = dataset["content"].map(remove_trump)
+
+
+def remove_trump(txt):
+    # Remove hashtags, @ ats, and a signature in many Trump's tweets
+    return re.sub(
+        r"((@|#) \w*\b|(@|#)\w*\b|--|\"|:|(d|D)onald|J\.|(t|T)rump)|DONALD|TRUMP",
+        "",
+        txt,
+    )
 
 
 dataset["content"] = dataset["content"].map(remove_links)
 dataset["content"] = dataset["content"].map(remove_trump)
 
 # Save
-dataset.to_csv("dataset_4.csv")
+dataset.to_csv("dataset_5.csv")

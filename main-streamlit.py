@@ -3,7 +3,7 @@ from random import sample
 from load_bert_model import load_bert_model
 from torch.nn import Module
 
-MODEL_NAME = "models/bert_cased_6.pt"
+MODEL_NAME = "models/minibert_cased_3.pt"
 PRODUCTION_MODE = False
 
 st.beta_set_page_config(page_title="Sounds like a Trump tweet", page_icon="trump.jpeg")
@@ -31,24 +31,27 @@ model = load_model()
 # @st.cache
 def get_description(score):
     desc_list = [
-        ["Not a Trump tweet. For sure.", "This is so not Trump it could be Biden."],
-        ["Doesn't sound much like Trump.", "Not Trump-esque enough."],
-        ["Not very Trump-like."],
+        [
+            "Not written like a Trump tweet. For sure.",
+            "This is definitely not a Trump tweet.",
+        ],
+        ["Doesn't sound much like a Trump tweet.", "Not Trump-esque at all."],
+        ["Not very Trump-like.", "Hmm, not very Trump-ish."],
         ["Doesn't really sound like Trump."],
         ["Trump vibes for sure.", "Feels somehow like Trump."],
         [
-            "This sounds a bit like Trump.",
-            "This could be Trump (I mean, you never know).",
+            "This is written a bit like Trump.",
+            "Trump could maybe write this.",
         ],
-        ["This sounds a lot like Trump.", "This sounds VERY MUCH like Trump."],
+        ["Trump pretty much writes like this.", "This sounds a lot like Trump."],
         [
-            "Trump would totally tweet that.",
-            "In a parallel universe Trump did tweet that.",
+            "Classic Trump style.",
+            "That's Trump's style for sure!",
         ],
         [
-            "Totally sounds like Trump (could be him).",
-            "Yep. Definitely sounds like Trump!",
-            "That's ABSOLUTELY how Trump sounds.",
+            "This is how Trump write!",
+            "Trump could easily write that.",
+            "That's pretty much how Trump writes.",
         ],
     ]
     score_range = [i / len(desc_list) for i in range(len(desc_list) + 1)]
@@ -61,13 +64,13 @@ st.markdown(
     """
 # Sounds like a Trump tweet
 
-Enter some text below. A Deep Learning model tells you if it sounds\
+Enter some text below. A Deep Learning model tells you if it's written\
      like a Donald Trump's tweet. Try to fool the model!
 """
 )
 
 user_input = st.text_area(
-    label="Does this text sounds like a Donald Trump's tweet?",
+    label="Is this written like a Donald Trump's tweet?",
     max_chars=280,
     height=128,
 ).strip()
@@ -83,6 +86,13 @@ if user_input != "":
 
 st.markdown(
     """
+    --------------
+    ### Tips to make your tweet Trump-like
+    - WRITE IN ALL CAPS
+    - Add exclamation points!!!
+    - Write. Short. Sentences. 
+    - Use Trump's linguo.
+
     --------------
     # About 
 
