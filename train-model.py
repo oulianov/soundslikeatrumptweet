@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+import re
+
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import FunctionTransformer
@@ -9,16 +13,12 @@ from joblib import dump, load
 from gensim.models import Word2Vec
 from gensim.sklearn_api import D2VTransformer
 
-import pandas as pd
-import numpy as np
-import re
-
-DATASET_NAME = "dataset_4.csv"
-MODEL_NAME = "w2v_log_1"
-
 import marshal
 from types import FunctionType
 from sklearn.base import BaseEstimator, TransformerMixin, MetaEstimatorMixin
+
+DATASET_NAME = "dataset_5.csv"
+MODEL_NAME = "models/tfidf_len_vocab_log_4"
 
 
 # Used to circonvent limitations when saving custom transformers
@@ -79,23 +79,6 @@ def get_avg_token_len(x):
     return get_txt_len(x) / np.maximum(1, get_nb_tokens(x))
 
 
-class MyTokenizer(BaseEstimator, MetaEstimatorMixin):
-    """Tokenize input strings based on a simple word-boundary pattern."""
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        ## split on word-boundary. A simple technique, yes, but mirrors what sklearn does to preprocess:
-        ## https://github.com/scikit-learn/scikit-learn/blob/7b136e9/sklearn/feature_extraction/text.py#L261-L266
-        token_pattern = re.compile(r"(?u)\b\w\w+\b")
-        parser = lambda doc: token_pattern.findall(doc)
-        return [parser(sentence) for sentence in X]
-
-
-w2v_vectorizer = D2VTransformer(dm=1, size=100, min_count=2, iter=10, seed=0)
-
-
 count_characters = (
     "count_characters",
     TfidfVectorizer(
@@ -115,7 +98,7 @@ tfidf_2grams = (
     "freq_2grams",
     TfidfVectorizer(
         lowercase=True,
-        ngram_range=(2, 2),
+        ngram_range=(1, 2),
         analyzer="word",
         min_df=4,
         dtype=np.float32,
@@ -124,23 +107,16 @@ tfidf_2grams = (
         use_idf=False,
     ),
 )
-tfidf_4grams = (
-    "tfidf_4grams",
-    TfidfVectorizer(
-        lowercase=True,
-        ngram_range=(4, 4),
-        analyzer="word",
-        min_df=2,
-        dtype=np.float32,
-        # max_df=0.,
-        max_features=80000,
-    ),
-)
-
 
 logistic_regression = (
     "logistic",
-    LogisticRegressionCV(Cs=5, scoring="f1", n_jobs=-1),
+    LogisticRegressionCV(
+        Cs=[2000, 5000, 10000, 15000, 20000],
+        scoring="f1",
+        n_jobs=-1,
+        class_weight="balanced",
+        max_iter=20000,
+    ),
 )
 
 
@@ -151,14 +127,8 @@ log = Pipeline(
             FeatureUnion(
                 [
                     ("nb_unique_tokens", get_nb_unique_tokens),
-                    ("avg_token_len", get_avg_token_len),
-                    (
-                        "d2v",
-                        Pipeline(
-                            [("tokenize", MyTokenizer()), ("w2v", w2v_vectorizer)],
-                            verbose=True,
-                        ),
-                    ),
+                    count_characters,
+                    tfidf_2grams,
                 ],
                 n_jobs=4,
             ),
@@ -178,16 +148,11 @@ log.steps[0][1].n_jobs = 1
 log.steps[1][1].n_jobs = 1
 dump(log, MODEL_NAME)
 print("Done.")
+print(log.score)
 
-# Delete everything and reload model to display the F1.
+# Delete everything and reload model (test)
 
 del log
 del get_nb_unique_tokens
 del get_avg_token_len
 log = load(MODEL_NAME)
-
-from sklearn.metrics import f1_score
-
-print(
-    f"F1: {f1_score(full_dataset['trump'].to_numpy(), log.predict(full_dataset['content'].to_list()))}"
-)

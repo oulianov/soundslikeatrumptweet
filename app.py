@@ -3,7 +3,7 @@ from random import sample
 from load_model import metaModel, MyFunctionTransformer
 
 bert_model_name = "minibert_cased_3.pt"
-log_model_name = "tfidf_len_vocab_log_2"
+log_model_name = "tfidf_len_vocab_log_4"
 PRODUCTION_MODE = False
 
 st.beta_set_page_config(page_title="Sounds like a Trump tweet", page_icon="trump.jpeg")
@@ -102,6 +102,8 @@ user_input = st.text_area(
 ).strip()
 
 if user_input != "":
+    for char in "#-=@+%":  # These make the model fail
+        user_input = user_input.replace(char, "")
     score = model.predict_proba([user_input])[:, 1]
     st.markdown(
         f"""
@@ -114,10 +116,11 @@ st.markdown(
     """
     --------------
     ### Tips to make your tweet Trump-like
+    - YELL IN ALL CAPS
     - Add exclamation points!!!
-    - Write. Short. Sentences. 
+    - Write short sentences. 
     - Use Trump's linguo.
-
+    
     --------------
     # About 
 
