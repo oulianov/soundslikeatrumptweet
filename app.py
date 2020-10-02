@@ -1,31 +1,35 @@
 import streamlit as st
 from random import sample
-from load_bert_model import load_bert_model
-from torch.nn import Module
+from load_model import metaModel, MyFunctionTransformer
 
-MODEL_NAME = "minibert_cased_3.pt"
-PRODUCTION_MODE = True
+bert_model_name = "minibert_cased_3.pt"
+log_model_name = "tfidf_len_vocab_log_2"
+PRODUCTION_MODE = False
 
 st.beta_set_page_config(page_title="Sounds like a Trump tweet", page_icon="trump.jpeg")
 
-# Hide Hamburger menu
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-</style>
-
-"""
 if PRODUCTION_MODE:
+    # Hide Hamburger menu
+    hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+
+    """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+else:
+    bert_model_name = "models/" + bert_model_name
+    log_model_name = "models/" + log_model_name
 
 
-@st.cache(hash_funcs={Module: id})
-def load_model():
-    return load_bert_model(MODEL_NAME)
+@st.cache(hash_funcs={metaModel: id})
+def load_meta_model():
+    model = metaModel(bert_model_name, log_model_name)
+    return model
 
 
-model = load_model()
+model = load_meta_model()
 
 
 # @st.cache
@@ -38,7 +42,7 @@ def get_description(score):
         [
             "Doesn't sound like a Trump tweet.",
             "Not Trump-esque at all.",
-            "This has no Trump's tweeter vibes.",
+            "Not really Trump's tweeter vibes.",
         ],
         [
             "Not very Trump-like.",
@@ -47,8 +51,8 @@ def get_description(score):
         ],
         [
             "Doesn't really sound like Trump.",
-            "Trump wouldn't write that on tweeter.",
-            "Trump wouldn't tweet it like that.",
+            "Trump wouldn't write that on tweeter (hopefuly).",
+            "Trump wouldn't exactly tweet it like that.",
         ],
         [
             "Maybe some Trump vibes.",
@@ -118,7 +122,7 @@ st.markdown(
     # About 
 
     **How does the algorithm work?** A Deep Learning model was trained \
-    over 120,000 tweets to automatically understand the syntax and semantics\
+    over 280,000 tweets to automatically understand the syntax and semantics\
     of Donald Trump's tweets. Visit the \
     [github repository](https://github.com/oulianov/soundslikeatrumptweet) for more details.
     
