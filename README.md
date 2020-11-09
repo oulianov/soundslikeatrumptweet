@@ -17,15 +17,15 @@ The predictions of the semantic and the syntactic submodels are multiplied toget
 
 ## Constraints
 
-1. In the dataset, there are only tweets. But on the website, the user may enter any text. This means that the model will have to work with text *out of distribution*, that don't look like the training data. 
-2. Heroku, the service hosting the website, imposes severe limits on disk size (500 Mo), memory, and CPU. Thus, model can't be too large.
-3. More than precise, model's predictions have to be fun. A user *should* be able to fool the model.
+1. In the dataset, there are only tweets. But on the website, the user may enter any text. This means that the model will have to work with text *out of distribution*, that doesn't look like the training data. 
+2. Heroku, the service hosting the website, imposes severe limits on disk size (500 Mo), memory, and CPU. Thus, model can't be too large or computationaly expensive.
+3. More than precise, model's predictions have to be fun. A user *should* be able to fool the model. 
 
 The constraints were solved the following way:
 
-1. Instead of just one, I used a combination of two submodels to improve the model's robustness. In practice, this lowers Recall to improve Precision. 
+1. Instead of just one, I used a combination of two submodels to improve the model's robustness. In practice, this lowers Recall and improves Sensitivity. 
 2. Instead of having a giant cased BERT model (over 1GB in size), I used a smaller version of the architecture. Thanks to [user Prajjwall](https://huggingface.co/prajjwal1/bert-mini) for providing this model! To keep case-dection, I combined it with a syntactic model. 
-3. To make sure that the model was foolable in a fun way, I asked friends to test the model, and adjusted parameters according to their feedback. I also added some advice.
+3. To make sure that the model was foolable in a fun way, I asked friends to test the model, and adjusted parameters according to their feedback. I also added on the website hints on how to fool the model.
 
 ## Note
 
